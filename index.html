@@ -1408,4 +1408,238 @@ function renderBudget() {
 renderOverview();
 </script>
 </body>
+</html>const lastUpdated='2026-04-09';
+
+const products=[
+  {name:'妻友',type:'付费',target:25000,budget:167000,w1:7732,w2:0,w3:0,w4:0,total:7732,consume:4165,completion:30.93,consumeRate:2.49},
+  {name:'海角乱伦社区',type:'付费',target:220000,budget:1260000,w1:50186,w2:0,w3:0,w4:0,total:50186,consume:243221,completion:22.81,consumeRate:19.3},
+  {name:'暗网禁区',type:'付费',target:70000,budget:477000,w1:19851,w2:0,w3:0,w4:0,total:19851,consume:47464,completion:28.36,consumeRate:9.95},
+  {name:'Al色色',type:'付费',target:40000,budget:493000,w1:8508,w2:0,w3:0,w4:0,total:8508,consume:33330,completion:21.27,consumeRate:6.76},
+  {name:'91短视频',type:'付费',target:180000,budget:477000,w1:43146,w2:0,w3:0,w4:0,total:43146,consume:47899,completion:23.97,consumeRate:10.04},
+  {name:'TikTok成人版',type:'付费',target:460000,budget:2390000,w1:125466,w2:0,w3:0,w4:0,total:125466,consume:307183,completion:27.28,consumeRate:12.85},
+  {name:'Pornhub中文版',type:'付费',target:150000,budget:427000,w1:32846,w2:0,w3:0,w4:0,total:32846,consume:16699,completion:21.9,consumeRate:3.91},
+  {name:'「良淫（抖阴Max）',type:'付费',target:30000,budget:231000,w1:7094,w2:0,w3:0,w4:0,total:7094,consume:4040,completion:23.65,consumeRate:1.75},
+  {name:'51动漫',type:'付费',target:100000,budget:229000,w1:47344,w2:0,w3:0,w4:0,total:47344,consume:211687,completion:47.34,consumeRate:92.44},
+  {name:'51品茶',type:'付费',target:100000,budget:1677000,w1:19317,w2:0,w3:0,w4:0,total:19317,consume:127051,completion:19.32,consumeRate:7.58},
+  {name:'禁漫天堂',type:'付费',target:120000,budget:301000,w1:49014,w2:0,w3:0,w4:0,total:49014,consume:49281,completion:40.85,consumeRate:16.37},
+  {name:'91Pron',type:'付费',target:350000,budget:1031000,w1:101336,w2:0,w3:0,w4:0,total:101336,consume:574661,completion:28.95,consumeRate:55.74},
+  {name:'萝莉岛APP',type:'付费',target:75000,budget:460000,w1:13339,w2:0,w3:0,w4:0,total:13339,consume:51536,completion:17.79,consumeRate:11.2},
+  {name:'51成人破解',type:'免费',target:300000,budget:540000,w1:77392,w2:0,w3:0,w4:0,total:77392,consume:65383,completion:25.8,consumeRate:12.11},
+  {name:'51推特破解',type:'免费',target:500000,budget:560000,w1:94745,w2:0,w3:0,w4:0,total:94745,consume:115285,completion:18.95,consumeRate:20.59},
+  {name:'51tiktok破解',type:'免费',target:600000,budget:630000,w1:230266,w2:0,w3:0,w4:0,total:230266,consume:140047,completion:38.38,consumeRate:22.23},
+  {name:'pornhub免费版',type:'免费',target:500000,budget:770000,w1:104621,w2:0,w3:0,w4:0,total:104621,consume:107774,completion:20.92,consumeRate:14},
+];
+
+const fmt = n => n >= 1000000 ? (n/1000000).toFixed(2)+'M' : n >= 1000 ? (n/1000).toFixed(0)+'K' : n;
+const rateColor = r => r >= 35 ? 'var(--green)' : r >= 25 ? 'var(--gold)' : 'var(--blue)';
+const rateClass = r => r >= 35 ? 'prog-high' : r >= 25 ? 'prog-med' : 'prog-low';
+const consumeColor = r => r >= 50 ? 'var(--red)' : r >= 20 ? 'var(--amber)' : 'var(--green)';
+
+// ── 更新时间显示 ──
+document.getElementById('updateTimeVal').textContent = lastUpdated;
+
+// ── 更新指引弹窗 ──
+function showUpdateGuide() {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)';
+  overlay.innerHTML = `
+    <div style="background:#111318;border:1px solid rgba(201,168,76,0.3);border-radius:20px;padding:36px 40px;max-width:560px;width:90%;position:relative">
+      <div style="position:absolute;top:16px;right:20px;cursor:pointer;font-size:20px;color:#4a5266" onclick="this.closest('[style]').remove()">✕</div>
+      <div style="font-size:11px;letter-spacing:0.15em;color:#c9a84c;text-transform:uppercase;margin-bottom:8px">数据更新指南</div>
+      <div style="font-family:'Noto Serif SC',serif;font-size:22px;font-weight:900;color:#dde2ef;margin-bottom:24px">如何更新看板数据？</div>
+
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:#141820;border-radius:12px;padding:18px 20px;border:1px solid rgba(255,255,255,0.07)">
+          <div style="color:#c9a84c;font-weight:700;font-size:13px;margin-bottom:8px">📋 步骤一：找到数据区</div>
+          <div style="color:#8892aa;font-size:12px;line-height:1.8">用文本编辑器（记事本/VSCode）打开 <code style="background:#0e1118;padding:2px 6px;border-radius:4px;color:#3ecf8e">北斗悦达_项目管理工作台.html</code>，搜索 <code style="background:#0e1118;padding:2px 6px;border-radius:4px;color:#3ecf8e">📊 数据更新区</code> 定位到数据区域</div>
+        </div>
+        <div style="background:#141820;border-radius:12px;padding:18px 20px;border:1px solid rgba(255,255,255,0.07)">
+          <div style="color:#c9a84c;font-weight:700;font-size:13px;margin-bottom:8px">✏️ 步骤二：修改数字</div>
+          <div style="color:#8892aa;font-size:12px;line-height:1.8">找到对应产品那一行，修改 <code style="background:#0e1118;padding:2px 6px;border-radius:4px;color:#f5a623">w2/w3/w4/total/consume/completion/consumeRate</code> 等字段的数值，同时把 <code style="background:#0e1118;padding:2px 6px;border-radius:4px;color:#3ecf8e">lastUpdated</code> 改为今天日期</div>
+        </div>
+        <div style="background:#141820;border-radius:12px;padding:18px 20px;border:1px solid rgba(255,255,255,0.07)">
+          <div style="color:#c9a84c;font-weight:700;font-size:13px;margin-bottom:8px">💾 步骤三：保存 + 刷新</div>
+          <div style="color:#8892aa;font-size:12px;line-height:1.8">保存文件后，在浏览器按 <code style="background:#0e1118;padding:2px 6px;border-radius:4px;color:#4a90e2">F5</code> 刷新，看板立即显示最新数据 ✅</div>
+        </div>
+        <div style="background:rgba(62,207,142,0.08);border-radius:12px;padding:14px 20px;border:1px solid rgba(62,207,142,0.2)">
+          <div style="color:#3ecf8e;font-size:12px;line-height:1.8">💡 <strong>更省力的方式：</strong>直接把最新的 Google Sheets 数据截图发给 Claude，让 Claude 帮你更新数据区的数字，无需自己手动改文件</div>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e => { if(e.target === overlay) overlay.remove(); });
+}
+
+// ── NAV ──
+function switchPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  el.classList.add('active');
+  const titles = { overview:'项目概览', product:'产品投放', budget:'预算与支出', team:'人员与分工', review:'月度复盘' };
+  document.getElementById('topbarTitle').textContent = titles[id];
+  // Render charts lazily
+  if (id === 'overview' && !window._overviewDone) renderOverview();
+  if (id === 'product'  && !window._productDone)  renderProduct();
+  if (id === 'budget'   && !window._budgetDone)   renderBudget();
+}
+
+// ── CHART DEFAULTS ──
+const gridColor = 'rgba(255,255,255,0.05)';
+const tickColor = '#4a5266';
+const defaultFont = { family: "'JetBrains Mono', monospace", size: 11 };
+
+// ── OVERVIEW LIST ──
+function renderOverview() {
+  window._overviewDone = true;
+  const sorted = [...products].sort((a,b) => b.completion - a.completion);
+  const el = document.getElementById('overviewList');
+  el.innerHTML = sorted.map((d, i) => {
+    const color = d.completion >= 35 ? 'var(--green)' : d.completion >= 25 ? 'var(--gold)' : 'var(--blue)';
+    const badge = d.type === '付费' ? `<span style="font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(74,144,226,0.15);color:var(--blue);border:1px solid rgba(74,144,226,0.25);margin-left:6px">付费</span>` : `<span style="font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(62,207,142,0.15);color:var(--green);border:1px solid rgba(62,207,142,0.25);margin-left:6px">免费</span>`;
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3);width:18px;text-align:center;${i<3?'color:var(--gold);font-weight:700':''}">${i+1}</span>
+        <span style="font-size:13px;font-weight:500;color:var(--text)">${d.name}</span>
+        ${badge}
+      </div>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:${color}">${d.completion}%</span>
+    </div>`;
+  }).join('');
+}
+
+// ── PRODUCT CHART & TABLE ──
+function renderProduct() {
+  window._productDone = true;
+
+  // Completion rank
+  const rankEl = document.getElementById('completionRank');
+  const sorted = [...products].sort((a,b) => b.completion - a.completion);
+  sorted.forEach((d,i) => {
+    const pct = (d.completion / sorted[0].completion * 100).toFixed(0);
+    rankEl.innerHTML += `<li class="rank-item">
+      <span class="rank-num ${i<3?'top':''}">${i+1}</span>
+      <span class="rank-name">${d.name}</span>
+      <div class="rank-bar-wrap"><div class="rank-bar" style="width:${pct}%;background:${rateColor(d.completion)}"></div></div>
+      <span class="rank-val" style="color:${rateColor(d.completion)}">${d.completion}%</span>
+    </li>`;
+  });
+
+  // Bar chart
+  const top10 = [...products].sort((a,b)=>b.total-a.total);
+  new Chart(document.getElementById('productChart'), {
+    type: 'bar',
+    data: {
+      labels: top10.map(d => d.name.length>7 ? d.name.slice(0,7)+'…' : d.name),
+      datasets: [{
+        data: top10.map(d=>d.total),
+        backgroundColor: top10.map(d => d.type==='付费' ? 'rgba(74,144,226,0.7)' : 'rgba(62,207,142,0.7)'),
+        borderRadius:4, borderSkipped:false,
+      }]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>` ${c.raw.toLocaleString()}` } } },
+      scales:{
+        x:{ grid:{display:false}, ticks:{color:'#8892aa',font:{size:10}}, border:{color:'transparent'} },
+        y:{ grid:{color:gridColor}, ticks:{color:tickColor,font:defaultFont,callback:v=>fmt(v)}, border:{color:'transparent'} }
+      }
+    }
+  });
+
+  // Table
+  const tbody = document.getElementById('productTable');
+  products.forEach(d => {
+    tbody.innerHTML += `<tr>
+      <td style="font-weight:500">${d.name}</td>
+      <td style="text-align:center"><span class="badge ${d.type==='付费'?'badge-paid':'badge-free'}">${d.type}</span></td>
+      <td>${fmt(d.target)}</td>
+      <td>${d.w1.toLocaleString()}</td>
+      <td>${d.w3t.toLocaleString()}</td>
+      <td style="color:var(--text)">${d.total.toLocaleString()}</td>
+      <td><div class="prog-row"><div class="prog-bar"><div class="prog-fill ${rateClass(d.completion)}" style="width:${d.completion}%"></div></div><span class="prog-val" style="color:${rateColor(d.completion)}">${d.completion}%</span></div></td>
+      <td><span style="color:${consumeColor(d.consumeRate)}">${d.consumeRate}%</span></td>
+    </tr>`;
+  });
+}
+
+// ── BUDGET CHART & TABLE ──
+function renderBudget() {
+  window._budgetDone = true;
+
+  // 总消耗率环形图
+  new Chart(document.getElementById('totalConsumeDonut'), {
+    type: 'doughnut',
+    data: {
+      datasets: [{
+        data: [17.71, 82.29],
+        backgroundColor: ['rgba(201,168,76,0.85)', 'rgba(255,255,255,0.06)'],
+        borderColor: ['var(--bg)', 'transparent'],
+        borderWidth: 3,
+        hoverOffset: 4,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '72%',
+      plugins: { legend:{ display:false }, tooltip:{ enabled:false } },
+      animation: { duration: 1200, easing: 'easeInOutQuart' }
+    }
+  });
+
+  // Consume rank
+  const rankEl = document.getElementById('consumeRank');
+  const sorted = [...products].sort((a,b)=>b.consumeRate-a.consumeRate);
+  sorted.forEach((d,i) => {
+    const pct = (d.consumeRate / sorted[0].consumeRate * 100).toFixed(0);
+    rankEl.innerHTML += `<li class="rank-item">
+      <span class="rank-num ${i<3?'top':''}">${i+1}</span>
+      <span class="rank-name">${d.name}</span>
+      <div class="rank-bar-wrap"><div class="rank-bar" style="width:${pct}%;background:${consumeColor(d.consumeRate)}"></div></div>
+      <span class="rank-val" style="color:${consumeColor(d.consumeRate)}">${d.consumeRate}%</span>
+    </li>`;
+  });
+
+  // Budget chart (horizontal)
+  const top8 = [...products].sort((a,b)=>b.budget-a.budget).slice(0,10);
+  new Chart(document.getElementById('budgetChart'), {
+    type:'bar',
+    data:{
+      labels: top8.map(d=>d.name.length>7?d.name.slice(0,7)+'…':d.name),
+      datasets:[
+        { label:'预算', data:top8.map(d=>d.budget), backgroundColor:'rgba(74,144,226,0.3)', borderRadius:3, borderSkipped:false },
+        { label:'已消耗', data:top8.map(d=>d.consume), backgroundColor:'rgba(245,166,35,0.7)', borderRadius:3, borderSkipped:false },
+      ]
+    },
+    options:{
+      indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ labels:{ color:'#8892aa', font:defaultFont } }, tooltip:{ callbacks:{ label:c=>` ${c.dataset.label}: ${c.raw.toLocaleString()}` } } },
+      scales:{
+        x:{ grid:{color:gridColor}, ticks:{color:tickColor,font:defaultFont,callback:v=>fmt(v)}, border:{color:'transparent'}, stacked:false },
+        y:{ grid:{display:false}, ticks:{color:'#8892aa',font:{size:11}}, border:{color:'transparent'} }
+      }
+    }
+  });
+
+  // Table
+  const tbody = document.getElementById('budgetTable');
+  products.forEach(d => {
+    const remain = d.budget - d.consume;
+    const warn = d.consumeRate >= 50 ? '<span class="badge badge-high">⚠️ 超支风险</span>' : d.consumeRate >= 20 ? '<span class="badge badge-mid">注意</span>' : '<span class="badge badge-ok">正常</span>';
+    tbody.innerHTML += `<tr>
+      <td style="font-weight:500">${d.name}</td>
+      <td style="text-align:center"><span class="badge ${d.type==='付费'?'badge-paid':'badge-free'}">${d.type}</span></td>
+      <td>${d.budget.toLocaleString()}</td>
+      <td style="color:var(--amber)">${d.consume.toLocaleString()}</td>
+      <td style="color:var(--green)">${remain.toLocaleString()}</td>
+      <td><span style="color:${consumeColor(d.consumeRate)}">${d.consumeRate}%</span></td>
+      <td style="text-align:center">${warn}</td>
+    </tr>`;
+  });
+}
+
+// Init
+renderOverview();
+</script>
+</body>
 </html>
